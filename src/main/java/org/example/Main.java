@@ -14,8 +14,9 @@ public class Main {
             System.out.println("Pilih mode yang ingin Anda jalankan:");
             System.out.println("1: Visualisasi Sorting Langkah per Langkah (Input Manual)");
             System.out.println("2: Uji Kecepatan Sorting (100.000 Angka Acak)");
-            System.out.println("3: Keluar");
-            System.out.print("Masukkan pilihan Anda (1/2/3): ");
+            System.out.println("3: Visualisasi Otomatis (Best & Worst Case)");
+            System.out.println("4: Keluar");
+            System.out.print("Masukkan pilihan Anda (1/2/3/4): ");
 
             String choice = scanner.next();
 
@@ -27,6 +28,9 @@ public class Main {
                     jalankanUjiKecepatan();
                     break;
                 case "3":
+                    jalankanModeOtomatis(); // Memanggil fungsi baru
+                    break;
+                case "4":
                     System.out.println("Terima kasih telah menggunakan program ini.");
                     scanner.close();
                     return; // Keluar dari program
@@ -38,10 +42,104 @@ public class Main {
     }
 
     /**
-     * PERUBAHAN DI SINI:
-     * Mode 1: Menjalankan visualisasi langkah per langkah dengan input jumlah angka,
-     * dan memungkinkan pengguna untuk mencoba beberapa algoritma pada data yang sama.
+     * BARU: Mode 3 - Menjalankan visualisasi otomatis untuk best & worst case.
      */
+    public static void jalankanModeOtomatis() {
+        System.out.println("\n===== Mode: Visualisasi Otomatis Best & Worst Case =====");
+        System.out.println("Program akan menjalankan 3 algoritma sorting pada 3 jenis data:");
+        System.out.println("1. Data Terurut (Best Case untuk Bubble & Insertion Sort)");
+        System.out.println("2. Data Terurut Terbalik (Worst Case untuk Bubble & Insertion Sort)");
+        System.out.println("3. Data Acak (Kasus Umum)");
+        System.out.println("-------------------------------------------------------------\n");
+
+        // 1. Definisikan dataset
+        linkedlist dataTerurut = createList(new int[]{11, 22, 33, 44, 55, 66, 77, 88, 99, 100});
+        linkedlist dataTerbalik = createList(new int[]{100, 99, 88, 77, 66, 55, 44, 33, 22, 11});
+        linkedlist dataAcak = createList(new int[]{55, 22, 99, 11, 77, 33, 88, 44, 66, 100});
+
+        // ================== BUBBLE SORT ==================
+        System.out.println("\n############### ANALISIS BUBBLE SORT ###############");
+        // Best Case
+        runAndDisplay("Bubble Sort: Best Case (Data Sudah Terurut)", new buble_sort(), dataTerurut);
+        // Worst Case
+        runAndDisplay("Bubble Sort: Worst Case (Data Terurut Terbalik)", new buble_sort(), dataTerbalik);
+        // Average Case
+        runAndDisplay("Bubble Sort: Average Case (Data Acak)", new buble_sort(), dataAcak);
+
+        // ================== SELECTION SORT ==================
+        System.out.println("\n############### ANALISIS SELECTION SORT ###############");
+        // Best Case (Swap minimal)
+        runAndDisplay("Selection Sort: Best Case (Swap Minimal)", new selection_sort(), dataTerurut);
+        // Worst Case (Swap maksimal)
+        runAndDisplay("Selection Sort: Worst Case (Swap Maksimal)", new selection_sort(), dataTerbalik);
+        // Average Case
+        runAndDisplay("Selection Sort: Average Case (Data Acak)", new selection_sort(), dataAcak);
+
+        // ================== INSERTION SORT ==================
+        System.out.println("\n############### ANALISIS INSERTION SORT ###############");
+        // Best Case
+        runAndDisplay("Insertion Sort: Best Case (Data Sudah Terurut)", new insertion_sort(), dataTerurut);
+        // Worst Case
+        runAndDisplay("Insertion Sort: Worst Case (Data Terurut Terbalik)", new insertion_sort(), dataTerbalik);
+        // Average Case
+        runAndDisplay("Insertion Sort: Average Case (Data Acak)", new insertion_sort(), dataAcak);
+
+        System.out.println("\n===== Visualisasi Otomatis Selesai =====");
+        System.out.println("Tekan Enter untuk kembali ke Menu Utama...");
+        try { System.in.read(); } catch(Exception e) {}
+    }
+
+    /**
+     * Helper untuk membuat linked list dari array integer.
+     */
+    public static linkedlist createList(int[] data) {
+        linkedlist list = new linkedlist();
+        for (int value : data) {
+            list.insert(value);
+        }
+        return list;
+    }
+
+    /**
+     * Helper untuk menjalankan dan menampilkan hasil sorting.
+     */
+    public static void runAndDisplay(String title, Object sorter, linkedlist originalList) {
+        System.out.println("\n======================================================");
+        System.out.println(title);
+        System.out.println("------------------------------------------------------");
+        System.out.print("Data Awal: ");
+        originalList.display();
+        System.out.println("\n");
+
+        linkedlist listToSort = copyList(originalList);
+
+        // Menjalankan visualisasi langkah per langkah
+        if (sorter instanceof buble_sort) {
+            ((buble_sort) sorter).sort_tampilkan(listToSort);
+        } else if (sorter instanceof selection_sort) {
+            ((selection_sort) sorter).sort_tampilkan(listToSort);
+        } else if (sorter instanceof insertion_sort) {
+            ((insertion_sort) sorter).sort_tampilkan(listToSort);
+        }
+
+        // Menjalankan timer untuk mengukur kecepatan
+        linkedlist listForTimer = copyList(originalList);
+        long timeTaken = 0;
+        if (sorter instanceof buble_sort) {
+            timeTaken = ((buble_sort) sorter).sort_timer(listForTimer);
+        } else if (sorter instanceof selection_sort) {
+            timeTaken = ((selection_sort) sorter).sort_timer(listForTimer);
+        } else if (sorter instanceof insertion_sort) {
+            timeTaken = ((insertion_sort) sorter).sort_timer(listForTimer);
+        }
+
+        System.out.print("\nData Hasil Urut: ");
+        listToSort.display();
+        System.out.printf("\nWaktu Eksekusi: %,d ns\n", timeTaken);
+        System.out.println("======================================================");
+    }
+
+
     public static void jalankanModeVisualisasi(Scanner scanner) {
         linkedlist myList = new linkedlist();
 
@@ -57,8 +155,8 @@ public class Main {
                 myList.insert(scanner.nextInt());
             } catch (Exception e) {
                 System.out.println("Input tidak valid. Silakan masukkan angka.");
-                scanner.next(); // Membersihkan buffer scanner
-                i--; // Ulangi iterasi
+                scanner.next();
+                i--;
             }
         }
 
@@ -67,7 +165,6 @@ public class Main {
             return;
         }
 
-        // Loop agar pengguna bisa mencoba sorting berulang kali pada data yang sama
         while (true) {
             System.out.println("\nData asli yang Anda masukkan:");
             myList.display();
@@ -83,11 +180,9 @@ public class Main {
 
             if (algoChoice == 4) {
                 System.out.println("Kembali ke Menu Utama...");
-                break; // Keluar dari loop visualisasi
+                break;
             }
 
-            // PENTING: Buat salinan list DI DALAM loop
-            // Ini memastikan kita selalu menggunakan data asli yang belum terurut
             linkedlist listToSort = copyList(myList);
 
             switch (algoChoice) {
@@ -100,8 +195,6 @@ public class Main {
                     new selection_sort().sort_tampilkan(listToSort);
                     break;
                 case 3:
-                    // Pastikan Anda sudah membuat class insertion_sort
-                    // dan method sort_tampilkan di dalamnya
                     System.out.println("\n--- Visualisasi Insertion Sort ---");
                     new insertion_sort().sort_tampilkan(listToSort);
                     break;
@@ -111,26 +204,20 @@ public class Main {
             }
 
             System.out.println("\nTekan Enter untuk melanjutkan...");
-            scanner.nextLine(); // Menunggu input sebelum membersihkan layar/melanjutkan
+            scanner.nextLine();
             scanner.nextLine();
         }
     }
 
-    // Fungsi jalankanUjiKecepatan() dan copyList() tidak perlu diubah, jadi tetap sama.
 
-    /**
-     * Mode 2: Menjalankan uji kecepatan pada 100.000 angka acak.
-     */
     public static void jalankanUjiKecepatan() {
         System.out.println("\n===== Mode: Uji Kecepatan Sorting =====");
         System.out.println("Membuat list dengan 100.000 angka acak (0-9999)...");
 
         linkedlist randomList = new linkedlist();
-
-
         Random rand = new Random();
         for (int i = 0; i < 100000; i++) {
-            randomList.insert(rand.nextInt(100000)); // Angka acak antara 0-9999
+            randomList.insert(rand.nextInt(9999));
         }
 
         System.out.println("Data acak berhasil dibuat. Memulai pengujian...");
@@ -138,7 +225,6 @@ public class Main {
         long insertionSortTime = new insertion_sort().sort_timer(copyList(randomList));
         long bubbleSortTime = new buble_sort().sort_timer(copyList(randomList));
         long selectionSortTime = new selection_sort().sort_timer(copyList(randomList));
-
 
         System.out.println("...Proses selesai.");
         System.out.println("\n===== Hasil Perbandingan Kecepatan Sorting (100.000 Data Acak) =====");
@@ -149,9 +235,6 @@ public class Main {
         System.out.println("-------------------------------------------------");
     }
 
-    /**
-     * Helper method untuk membuat salinan dari sebuah linked list.
-     */
     public static linkedlist copyList(linkedlist originalList) {
         if (originalList == null || originalList.first == null) return new linkedlist();
         linkedlist newList = new linkedlist();
