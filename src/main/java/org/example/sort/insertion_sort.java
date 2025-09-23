@@ -5,124 +5,102 @@ import org.example.node.*;
 public class insertion_sort {
 
     /**
-     * Method sort dasar menggunakan algoritma Insertion Sort.
-     * Method ini mengatur ulang pointer, bukan hanya menukar data.
-     * @param list Objek linkedlist yang akan diurutkan.
+     * VERSI CEPAT (IN-PLACE):
+     * Method sort yang efisien untuk linked list.
      */
     public void sort(linkedlist list) {
         if (list == null || list.first == null || list.first.getnext() == null) {
             return;
         }
 
-        node sorted = null; // Ini akan menjadi head dari list yang sudah terurut
-        node current = list.first; // Pointer untuk iterasi list asli
+        node lastSorted = list.first;       // Penanda node terakhir di bagian terurut
+        node current = list.first.getnext(); // Node pertama di bagian yang belum terurut
 
         while (current != null) {
             node next = current.getnext(); // Simpan node selanjutnya
 
-            // Panggil helper method untuk menyisipkan 'current' ke list 'sorted'
-            sorted = sortedInsert(sorted, current);
+            // Kasus 1: Posisi 'current' sudah benar (lebih besar dari yg terurut terakhir)
+            if (current.getdata() >= lastSorted.getdata()) {
+                lastSorted = current; // Cukup majukan penanda
+            } else {
+                // Kasus 2: 'current' perlu disisipkan ke bagian terurut
+                node prev = null;
+                node scanner = list.first;
 
-            // Lanjutkan ke node berikutnya dari list asli
+                // Cari posisi sisip
+                while (scanner.getdata() < current.getdata()) {
+                    prev = scanner;
+                    scanner = scanner.getnext();
+                }
+
+                // Lepaskan 'current' dari posisinya saat ini
+                lastSorted.setnext(next);
+
+                // Sisipkan 'current' di posisi barunya
+                if (prev == null) { // Sisipkan di depan
+                    current.setnext(list.first);
+                    list.first = current;
+                } else { // Sisipkan di tengah
+                    current.setnext(scanner);
+                    prev.setnext(current);
+                }
+            }
+            // Lanjutkan ke elemen berikutnya
             current = next;
         }
-
-        // Update head dari list asli dengan list yang sudah terurut
-        list.first = sorted;
     }
 
-    /**
-     * Helper method untuk menyisipkan node ke posisi yang benar di dalam list terurut.
-     * @param sortedHead Head dari list yang sudah terurut.
-     * @param newNode Node baru yang akan disisipkan.
-     * @return Head baru dari list terurut.
-     */
-    private node sortedInsert(node sortedHead, node newNode) {
-        // Kasus 1: list terurut masih kosong atau newNode lebih kecil dari head
-        if (sortedHead == null || sortedHead.getdata() >= newNode.getdata()) {
-            newNode.setnext(sortedHead);
-            return newNode;
-        } else {
-            // Kasus 2: Cari posisi yang tepat untuk menyisipkan node
-            node current = sortedHead;
-            while (current.getnext() != null && current.getnext().getdata() < newNode.getdata()) {
-                current = current.getnext();
-            }
-            // Lakukan penyisipan
-            newNode.setnext(current.getnext());
-            current.setnext(newNode);
-        }
-        return sortedHead;
-    }
-
-
-    /**
-     * Mengurutkan dan menampilkan setiap langkah penyisipan.
-     * @param list Objek linkedlist yang akan diurutkan.
-     */
+    // Anda bisa mengadopsi method sort_tampilkan_inplace yang kita buat sebelumnya ke sini
     public void sort_tampilkan(linkedlist list) {
+        // (Gunakan kode sort_tampilkan_inplace dari jawaban sebelumnya)
         if (list == null || list.first == null || list.first.getnext() == null) {
             System.out.println("List tidak perlu diurutkan.");
             return;
         }
-
         System.out.println("Kondisi Awal:");
         list.display();
         System.out.println("\n-----------------------------------------");
-        System.out.println("Memulai proses Insertion Sort...");
-
-        node sorted = null; // Head untuk list yang sudah terurut
-        node current = list.first; // Pointer untuk iterasi list asli
+        System.out.println("Memulai proses Insertion Sort (In-Place)...");
+        node lastSorted = list.first;
+        node current = list.first.getnext();
         int step = 1;
-
         while (current != null) {
-            // Simpan node selanjutnya SEBELUM 'current' dipindahkan.
-            // 'next' akan menjadi head dari sisa list yang belum diurutkan.
             node next = current.getnext();
-
-            // Simpan data untuk ditampilkan, karena pointer 'current' akan diubah.
-            int dataToInsert = current.getdata();
-
-            System.out.println("\nLangkah ke-" + step + ": Mengambil elemen '" + dataToInsert + "'");
-
-            // Sisipkan 'current' ke dalam list 'sorted'
-            sorted = sortedInsert(sorted, current);
-
-            // ---- BAGIAN UNTUK MENAMPILKAN PROSES ----
-
-            // 1. Buat list sementara untuk menampilkan bagian yang sudah terurut
-            linkedlist sortedListDisplay = new linkedlist();
-            sortedListDisplay.first = sorted;
-            System.out.print("   -> List Terurut: ");
-            sortedListDisplay.display();
-
-            // 2. Buat list sementara untuk menampilkan sisa bagian yang belum terurut
-            linkedlist unsortedListDisplay = new linkedlist();
-            unsortedListDisplay.first = next; // Gunakan 'next' sebagai head
-            System.out.print("   -> Sisa List   : ");
-            unsortedListDisplay.display();
-
-            // Lanjutkan iterasi ke node berikutnya dari list asli
+            int dataToMove = current.getdata();
+            if (dataToMove < lastSorted.getdata()) {
+                System.out.println("\nLangkah ke-" + step + ": Elemen '" + dataToMove + "' tidak urut. Mencari posisi...");
+                lastSorted.setnext(next);
+                node prev = null;
+                node scanner = list.first;
+                while (scanner.getdata() < dataToMove) {
+                    prev = scanner;
+                    scanner = scanner.getnext();
+                }
+                if (prev == null) {
+                    current.setnext(list.first);
+                    list.first = current;
+                } else {
+                    current.setnext(scanner);
+                    prev.setnext(current);
+                }
+                System.out.print("   -> Hasil setelah menyisipkan '" + dataToMove + "': ");
+                list.display();
+            } else {
+                lastSorted = current;
+            }
             current = next;
             step++;
         }
-
-        // Update head dari list asli dengan list yang sudah terurut
-        list.first = sorted;
         System.out.println("\n-----------------------------------------");
         System.out.println("Proses sorting selesai!");
-        System.out.println("Hasil Akhir:");
-        list.display();
     }
 
     /**
-     * Mengurutkan dan mengukur waktu eksekusi.
-     * @param list Objek linkedlist yang akan diurutkan.
-     * @return Durasi sorting dalam nanodetik.
+     * Mengukur waktu eksekusi dari method sort yang CEPAT.
      */
     public long sort_timer(linkedlist list) {
         long startTime = System.nanoTime();
-        this.sort(list);
+        this.sort(list); // Pastikan ini memanggil sort() yang baru dan cepat
         long endTime = System.nanoTime();
         return endTime - startTime;
     }
