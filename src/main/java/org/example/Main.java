@@ -14,7 +14,7 @@ public class Main {
             System.out.println("Pilih mode yang ingin Anda jalankan:");
             System.out.println("1: Visualisasi Sorting Langkah per Langkah (Input Manual)");
             System.out.println("2: Uji Kecepatan Sorting (100.000 Angka Acak)");
-            System.out.println("3: Visualisasi Otomatis (Best & Worst Case)");
+            System.out.println("3: Visualisasi Otomatis ( 10 Angka Acak)");
             System.out.println("4: Keluar");
             System.out.print("Masukkan pilihan Anda (1/2/3/4): ");
 
@@ -45,43 +45,30 @@ public class Main {
      * BARU: Mode 3 - Menjalankan visualisasi otomatis untuk best & worst case.
      */
     public static void jalankanModeOtomatis() {
-        System.out.println("\n===== Mode: Visualisasi Otomatis Best & Worst Case =====");
-        System.out.println("Program akan menjalankan 3 algoritma sorting pada 3 jenis data:");
-        System.out.println("1. Data Terurut (Best Case untuk Bubble & Insertion Sort)");
-        System.out.println("2. Data Terurut Terbalik (Worst Case untuk Bubble & Insertion Sort)");
+        System.out.println("\n===== Mode: Visualisasi Otomatis Angka Acak =====");
+        System.out.println("Program akan menjalankan algoritma sorting:");
         System.out.println("3. Data Acak (Kasus Umum)");
         System.out.println("-------------------------------------------------------------\n");
 
         // 1. Definisikan dataset
-        linkedlist dataTerurut = createList(new int[]{11, 22, 33, 44, 55, 66, 77, 88, 99, 100});
-        linkedlist dataTerbalik = createList(new int[]{100, 99, 88, 77, 66, 55, 44, 33, 22, 11});
-        linkedlist dataAcak = createList(new int[]{55, 22, 99, 11, 77, 33, 88, 44, 66, 100});
+
+        Random rand = new Random();
+        linkedlist dataAcak = new linkedlist();
+        for (int i = 0; i < 10; i++) {
+            dataAcak.insert(rand.nextInt(99));
+        }
+
 
         // ================== BUBBLE SORT ==================
         System.out.println("\n############### ANALISIS BUBBLE SORT ###############");
-        // Best Case
-        runAndDisplay("Bubble Sort: Best Case (Data Sudah Terurut)", new buble_sort(), dataTerurut);
-        // Worst Case
-        runAndDisplay("Bubble Sort: Worst Case (Data Terurut Terbalik)", new buble_sort(), dataTerbalik);
-        // Average Case
         runAndDisplay("Bubble Sort: Average Case (Data Acak)", new buble_sort(), dataAcak);
 
         // ================== SELECTION SORT ==================
         System.out.println("\n############### ANALISIS SELECTION SORT ###############");
-        // Best Case (Swap minimal)
-        runAndDisplay("Selection Sort: Best Case (Swap Minimal)", new selection_sort(), dataTerurut);
-        // Worst Case (Swap maksimal)
-        runAndDisplay("Selection Sort: Worst Case (Swap Maksimal)", new selection_sort(), dataTerbalik);
-        // Average Case
         runAndDisplay("Selection Sort: Average Case (Data Acak)", new selection_sort(), dataAcak);
 
         // ================== INSERTION SORT ==================
         System.out.println("\n############### ANALISIS INSERTION SORT ###############");
-        // Best Case
-        runAndDisplay("Insertion Sort: Best Case (Data Sudah Terurut)", new insertion_sort(), dataTerurut);
-        // Worst Case
-        runAndDisplay("Insertion Sort: Worst Case (Data Terurut Terbalik)", new insertion_sort(), dataTerbalik);
-        // Average Case
         runAndDisplay("Insertion Sort: Average Case (Data Acak)", new insertion_sort(), dataAcak);
 
         System.out.println("\n===== Visualisasi Otomatis Selesai =====");
